@@ -112,6 +112,7 @@ class _DebugOptionsWidgetState extends State<DebugOptionsWidget> {
           showPlanes: _showPlanes,
           customPlaneTexturePath: _planeTexturePath,
           showWorldOrigin: _showWorldOrigin,
+          showAnimatedGuide: false,
         );
   }
 }

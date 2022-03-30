@@ -72,10 +72,13 @@ class _ScreenshotWidgetState extends State<ScreenshotWidget> {
     this.arAnchorManager = arAnchorManager;
 
     this.arSessionManager.onInitialize(
-          showFeaturePoints: false,
+          showFeaturePoints: true,
           showPlanes: true,
           customPlaneTexturePath: "Images/triangle.png",
           showWorldOrigin: true,
+          handlePans: true,
+          handleRotation: true,
+          showAnimatedGuide: false,
         );
     this.arObjectManager.onInitialize();
 
@@ -84,13 +87,15 @@ class _ScreenshotWidgetState extends State<ScreenshotWidget> {
   }
 
   Future<void> onRemoveEverything() async {
-    /*nodes.forEach((node) {
+    nodes.forEach((node) {
       this.arObjectManager.removeNode(node);
-    });*/
-    anchors.forEach((anchor) {
-      this.arAnchorManager.removeAnchor(anchor);
     });
-    anchors = [];
+
+    nodes = [];
+    // anchors.forEach((anchor) {
+    //   this.arAnchorManager.removeAnchor(anchor);
+    // });
+    // anchors = [];
   }
 
   Future<void> onTakeScreenshot() async {
@@ -112,33 +117,35 @@ class _ScreenshotWidgetState extends State<ScreenshotWidget> {
 
   Future<void> onPlaneOrPointTapped(
       List<ARHitTestResult> hitTestResults) async {
-    var singleHitTestResult = hitTestResults.firstWhere(
-        (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
+    var singleHitTestResult = hitTestResults.firstWhere((hitTestResult) =>
+        hitTestResult.type == ARHitTestResultType.point ||
+        hitTestResult.type == ARHitTestResultType.undefined ||
+        hitTestResult.type == ARHitTestResultType.plane);
     if (singleHitTestResult != null) {
-      var newAnchor =
-          ARPlaneAnchor(transformation: singleHitTestResult.worldTransform);
-      bool didAddAnchor = await this.arAnchorManager.addAnchor(newAnchor);
-      if (didAddAnchor) {
-        this.anchors.add(newAnchor);
-        // Add note to anchor
-        var newNode = ARNode(
-            type: NodeType.webGLB,
-            uri:
-                "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-            scale: Vector3(0.2, 0.2, 0.2),
-            position: Vector3(0.0, 0.0, 0.0),
-            rotation: Vector4(1.0, 0.0, 0.0, 0.0));
-        bool didAddNodeToAnchor =
-            await this.arObjectManager.addNode(newNode, planeAnchor: newAnchor);
-        if (didAddNodeToAnchor) {
-          this.nodes.add(newNode);
-        } else {
-          this.arSessionManager.onError("Adding Node to Anchor failed");
-        }
-      } else {
-        this.arSessionManager.onError("Adding Anchor failed");
-      }
-      /*
+      // var newAnchor =
+      //     ARPlaneAnchor(transformation: singleHitTestResult.worldTransform);
+      // bool didAddAnchor = await this.arAnchorManager.addAnchor(newAnchor);
+      // if (didAddAnchor) {
+      //   this.anchors.add(newAnchor);
+      //   // Add node to anchor
+      //   var newNode = ARNode(
+      //       type: NodeType.webGLB,
+      //       uri:
+      //           "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
+      //       scale: Vector3(0.2, 0.2, 0.2),
+      //       position: Vector3(0.0, 0.0, 0.0),
+      //       rotation: Vector4(1.0, 0.0, 0.0, 0.0));
+      //   bool didAddNodeToAnchor =
+      //       await this.arObjectManager.addNode(newNode, planeAnchor: newAnchor);
+      //   if (didAddNodeToAnchor) {
+      //     this.nodes.add(newNode);
+      //   } else {
+      //     this.arSessionManager.onError("Adding Node to Anchor failed");
+      //   }
+      // } else {
+      //   this.arSessionManager.onError("Adding Anchor failed");
+      // }
+
       // To add a node to the tapped position without creating an anchor, use the following code (Please mind: the function onRemoveEverything has to be adapted accordingly!):
       var newNode = ARNode(
           type: NodeType.localGLTF2,
@@ -148,7 +155,7 @@ class _ScreenshotWidgetState extends State<ScreenshotWidget> {
       bool didAddWebNode = await this.arObjectManager.addNode(newNode);
       if (didAddWebNode) {
         this.nodes.add(newNode);
-      }*/
+      }
     }
   }
 }
